@@ -7,6 +7,7 @@ from powers import PeekPower, RedrawPower, SafeHitPower
 HISTORY_FILE = "game_history.csv"
 NAME_PATTERN = r"[A-Za-z][A-Za-z0-9 _-]{1,19}"
 
+
 @dataclass
 class Card:
     rank: str
@@ -22,6 +23,7 @@ class Card:
     def __str__(self):
         return f"{self.rank}{self.suit}"
 
+
 class Deck:
     def __init__(self):
         ranks = ["A", "2", "3", "4", "5", "6", "7",
@@ -34,6 +36,7 @@ class Deck:
         if not self.cards:
             raise RuntimeError("The deck is empty.")
         return self.cards.pop()
+
 
 class Participant:
     def __init__(self, name):
@@ -59,27 +62,6 @@ class Participant:
     def hand_text(self):
         return ", ".join(str(card) for card in self.hand)
 
-class Player(Participant):
-    def __init__(self, name):
-        super().__init__(name)
-        self.round_wins = 0
-
-    def choose_action(self):
-        while True:
-            choice = input("\n[H]it or [S]tand? ").strip().lower()
-
-            if choice in ("h", "s"):
-                return choice
-
-            print("Please enter H or S.")
-
-class Dealer(Participant):
-    def __init__(self):
-        super().__init__("Dealer")
-
-    def play(self, deck):
-        while self.score() < 17:
-            self.add_card(deck.draw())
 
 class Player(Participant):
     def __init__(self, name):
@@ -95,6 +77,7 @@ class Player(Participant):
 
             print("Please enter H or S.")
 
+
 class Dealer(Participant):
     def __init__(self):
         super().__init__("Dealer")
@@ -102,6 +85,7 @@ class Dealer(Participant):
     def play(self, deck):
         while self.score() < 17:
             self.add_card(deck.draw())
+
 
 class BlackjackGame:
     def __init__(self, player_name):
@@ -150,7 +134,6 @@ class BlackjackGame:
 
         selected_power = self.powers[int(choice) - 1]
         selected_power.reset()
-
         return selected_power
 
     def player_turn(self, deck, power):
@@ -158,9 +141,7 @@ class BlackjackGame:
             self.show_table()
 
             if power and not power.used:
-                answer = input(
-                    f"\nUse {power.name}? [Y/N]: "
-                ).strip().lower()
+                answer = input(f"\nUse {power.name}? [Y/N]: ").strip().lower()
 
                 if answer == "y":
                     power.activate(self.player, self.dealer, deck)
@@ -179,18 +160,15 @@ class BlackjackGame:
 
         if self.player.is_bust():
             return "dealer"
-
         if self.dealer.is_bust():
             return "player"
-
         if player_score > dealer_score:
             return "player"
-
         if dealer_score > player_score:
             return "dealer"
 
         return "draw"
-    
+
     def play_round(self):
         print("\n" + "=" * 45)
         print(f"ROUND {self.round_number}")
@@ -201,7 +179,6 @@ class BlackjackGame:
         self.deal_starting_cards(deck)
 
         power = self.choose_power() if self.round_number >= 2 else None
-
         self.player_turn(deck, power)
 
         if not self.player.is_bust():
@@ -213,10 +190,8 @@ class BlackjackGame:
         if result == "player":
             self.player.round_wins += 1
             print("\nYOU WON THE ROUND!")
-
         elif result == "dealer":
             print("\nDealer won the round.")
-
         else:
             print("\nThe round was a draw.")
 
@@ -243,7 +218,6 @@ class BlackjackGame:
         print("\n" + "=" * 45)
         print("FINAL RESULTS")
         print("=" * 45)
-
         print(f"You won {self.player.round_wins}/3 rounds.")
 
         if self.player.round_wins == 3:
@@ -251,44 +225,38 @@ class BlackjackGame:
         else:
             print("\nYou did not win all three rounds.")
 
-    def clean_player_name(name):
-        return re.sub(r"\s+", " ", name.strip())
 
-    def valid_player_name(name):
-        return re.fullmatch(NAME_PATTERN, name) is not None
+def clean_player_name(name):
+    return re.sub(r"\s+", " ", name.strip())
 
-    def get_player_name():
-        while True:
-            name = clean_player_name(input("Enter player name: "))
 
-            if valid_player_name(name):
-                return name
+def valid_player_name(name):
+    return re.fullmatch(NAME_PATTERN, name) is not None
 
-            print("Name must contain 2-20 characters.")
-            print("Letters, numbers, spaces, _ and - are allowed.")
 
-    def load_history():
-        try:
-            with open(
-            HISTORY_FILE,
-            "r",
-            newline="",
-            encoding="utf-8"
-        ) as file:
-                return list(csv.DictReader(file))
+def get_player_name():
+    while True:
+        name = clean_player_name(input("Enter player name: "))
 
-        except FileNotFoundError:
-            return []
+        if valid_player_name(name):
+            return name
+
+        print("Name must contain 2-20 characters.")
+        print("Letters, numbers, spaces, _ and - are allowed.")
+
+
+def load_history():
+    try:
+        with open(HISTORY_FILE, "r", newline="", encoding="utf-8") as file:
+            return list(csv.DictReader(file))
+    except FileNotFoundError:
+        return []
+
 
 def save_result(name, round_number, player_score, dealer_score, result):
     history = load_history()
 
-    with open(
-        HISTORY_FILE,
-        "a",
-        newline="",
-        encoding="utf-8"
-    ) as file:
+    with open(HISTORY_FILE, "a", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
 
         if len(history) == 0:
@@ -308,6 +276,7 @@ def save_result(name, round_number, player_score, dealer_score, result):
             result
         ])
 
+
 def show_previous_games():
     history = load_history()
 
@@ -323,20 +292,18 @@ def show_previous_games():
             f"{result['Result'].upper()}"
         )
 
+
 def main():
     print("=" * 45)
     print("POWER BLACKJACK")
     print("=" * 45)
 
     show_previous_games()
-
     name = get_player_name()
     game = BlackjackGame(name)
-
     game.run()
+
 
 if __name__ == "__main__":
     main()
-
-
 
