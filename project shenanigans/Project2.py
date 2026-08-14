@@ -145,4 +145,49 @@ class BlackjackGame:
 
             print("Please choose 1, 2, 3 or 4.")
 
+        if choice == "4":
+            return None
+
+        selected_power = self.powers[int(choice) - 1]
+        selected_power.reset()
+
+        return selected_power
+
+    def player_turn(self, deck, power):
+        while not self.player.is_bust():
+            self.show_table()
+
+            if power and not power.used:
+                answer = input(
+                    f"\nUse {power.name}? [Y/N]: "
+                ).strip().lower()
+
+                if answer == "y":
+                    power.activate(self.player, self.dealer, deck)
+                    self.show_table()
+
+            action = self.player.choose_action()
+
+            if action == "s":
+                break
+
+            self.player.add_card(deck.draw())
+
+    def decide_winner(self):
+        player_score = self.player.score()
+        dealer_score = self.dealer.score()
+
+        if self.player.is_bust():
+            return "dealer"
+
+        if self.dealer.is_bust():
+            return "player"
+
+        if player_score > dealer_score:
+            return "player"
+
+        if dealer_score > player_score:
+            return "dealer"
+
+        return "draw"
 
