@@ -190,4 +190,44 @@ class BlackjackGame:
             return "dealer"
 
         return "draw"
+    
+    def play_round(self):
+        print("\n" + "=" * 45)
+        print(f"ROUND {self.round_number}")
+        print("=" * 45)
+
+        deck = Deck()
+        self.reset_hands()
+        self.deal_starting_cards(deck)
+
+        power = self.choose_power() if self.round_number >= 2 else None
+
+        self.player_turn(deck, power)
+
+        if not self.player.is_bust():
+            self.dealer.play(deck)
+
+        self.show_table(hide_dealer=False)
+        result = self.decide_winner()
+
+        if result == "player":
+            self.player.round_wins += 1
+            print("\nYOU WON THE ROUND!")
+
+        elif result == "dealer":
+            print("\nDealer won the round.")
+
+        else:
+            print("\nThe round was a draw.")
+
+        save_result(
+            self.player.name,
+            self.round_number,
+            self.player.score(),
+            self.dealer.score(),
+            result
+        )
+
+        return result
+
 
