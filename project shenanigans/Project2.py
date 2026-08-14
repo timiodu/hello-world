@@ -103,3 +103,46 @@ class Dealer(Participant):
         while self.score() < 17:
             self.add_card(deck.draw())
 
+class BlackjackGame:
+    def __init__(self, player_name):
+        self.player = Player(player_name)
+        self.dealer = Dealer()
+        self.round_number = 1
+        self.powers = [PeekPower(), RedrawPower(), SafeHitPower()]
+
+    def reset_hands(self):
+        self.player.hand = []
+        self.dealer.hand = []
+
+    def deal_starting_cards(self, deck):
+        for _ in range(2):
+            self.player.add_card(deck.draw())
+            self.dealer.add_card(deck.draw())
+
+    def show_table(self, hide_dealer=True):
+        print(f"\n{self.player.name}: {self.player.hand_text()}")
+        print(f"Your score: {self.player.score()}")
+
+        if hide_dealer:
+            print(f"Dealer: {self.dealer.hand[0]}, [HIDDEN]")
+        else:
+            print(f"Dealer: {self.dealer.hand_text()}")
+            print(f"Dealer score: {self.dealer.score()}")
+
+    def choose_power(self):
+        print("\n--- POWER SELECTION ---")
+
+        for number, power in enumerate(self.powers, start=1):
+            print(f"{number}. {power.name} - {power.description}")
+
+        print("4. No Power")
+
+        while True:
+            choice = input("\nChoose a power: ").strip()
+
+            if choice in ("1", "2", "3", "4"):
+                break
+
+            print("Please choose 1, 2, 3 or 4.")
+
+
