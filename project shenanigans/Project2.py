@@ -230,7 +230,7 @@ class BlackjackGame:
 
         return result
 
-     def run(self):
+    def run(self):
         print(f"\nWelcome to Power Blackjack, {self.player.name}!")
         print("There are three rounds.")
         print("Round 1 is normal blackjack.")
@@ -266,6 +266,77 @@ class BlackjackGame:
 
             print("Name must contain 2-20 characters.")
             print("Letters, numbers, spaces, _ and - are allowed.")
+
+    def load_history():
+        try:
+            with open(
+            HISTORY_FILE,
+            "r",
+            newline="",
+            encoding="utf-8"
+        ) as file:
+                return list(csv.DictReader(file))
+
+        except FileNotFoundError:
+            return []
+
+def save_result(name, round_number, player_score, dealer_score, result):
+    history = load_history()
+
+    with open(
+        HISTORY_FILE,
+        "a",
+        newline="",
+        encoding="utf-8"
+    ) as file:
+        writer = csv.writer(file)
+
+        if len(history) == 0:
+            writer.writerow([
+                "Player",
+                "Round",
+                "Player Score",
+                "Dealer Score",
+                "Result"
+            ])
+
+        writer.writerow([
+            name,
+            round_number,
+            player_score,
+            dealer_score,
+            result
+        ])
+
+def show_previous_games():
+    history = load_history()
+
+    if not history:
+        print("\nNo previous game history found.")
+        return
+
+    print("\n--- RECENT GAME HISTORY ---")
+
+    for result in history[-5:]:
+        print(
+            f"{result['Player']} | Round {result['Round']} | "
+            f"{result['Result'].upper()}"
+        )
+
+def main():
+    print("=" * 45)
+    print("POWER BLACKJACK")
+    print("=" * 45)
+
+    show_previous_games()
+
+    name = get_player_name()
+    game = BlackjackGame(name)
+
+    game.run()
+
+if __name__ == "__main__":
+    main()
 
 
 
