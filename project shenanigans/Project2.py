@@ -58,3 +58,48 @@ class Participant:
 
     def hand_text(self):
         return ", ".join(str(card) for card in self.hand)
+
+class Player(Participant):
+    def __init__(self, name):
+        super().__init__(name)
+        self.round_wins = 0
+
+    def choose_action(self):
+        while True:
+            choice = input("\n[H]it or [S]tand? ").strip().lower()
+
+            if choice in ("h", "s"):
+                return choice
+
+            print("Please enter H or S.")
+
+class Dealer(Participant):
+    def __init__(self):
+        super().__init__("Dealer")
+
+    def play(self, deck):
+        while self.score() < 17:
+            self.add_card(deck.draw())
+
+class Player(Participant):
+    def __init__(self, name):
+        super().__init__(name)
+        self.round_wins = 0
+
+    def choose_action(self):
+        while True:
+            choice = input("\n[H]it or [S]tand? ").strip().lower()
+
+            if choice in ("h", "s"):
+                return choice
+
+            print("Please enter H or S.")
+
+class Dealer(Participant):
+    def __init__(self):
+        super().__init__("Dealer")
+
+    def play(self, deck):
+        while self.score() < 17:
+            self.add_card(deck.draw())
+
