@@ -230,4 +230,42 @@ class BlackjackGame:
 
         return result
 
+     def run(self):
+        print(f"\nWelcome to Power Blackjack, {self.player.name}!")
+        print("There are three rounds.")
+        print("Round 1 is normal blackjack.")
+        print("Special powers unlock in rounds 2 and 3.")
+
+        for number in range(1, 4):
+            self.round_number = number
+            self.play_round()
+
+        print("\n" + "=" * 45)
+        print("FINAL RESULTS")
+        print("=" * 45)
+
+        print(f"You won {self.player.round_wins}/3 rounds.")
+
+        if self.player.round_wins == 3:
+            print("\nJACKPOT! You won every round and earned the payout!")
+        else:
+            print("\nYou did not win all three rounds.")
+
+    def clean_player_name(name):
+        return re.sub(r"\s+", " ", name.strip())
+
+    def valid_player_name(name):
+        return re.fullmatch(NAME_PATTERN, name) is not None
+
+    def get_player_name():
+        while True:
+            name = clean_player_name(input("Enter player name: "))
+
+            if valid_player_name(name):
+                return name
+
+            print("Name must contain 2-20 characters.")
+            print("Letters, numbers, spaces, _ and - are allowed.")
+
+
 
